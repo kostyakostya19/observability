@@ -1,0 +1,16 @@
+---
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'vm'
+    scrape_interval: 5s
+    scheme: http
+    static_configs:
+      - targers: ['http//localhost:9100']
+        labels:
+          instance: test_vm_9100
+      - targets: ['http//node_exporter:9090']
+        labels:
+          instance: test_vm
+          test_lables: test_label

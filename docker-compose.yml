@@ -1,0 +1,85 @@
+--- 
+services:
+  grafana:
+    image: grafana/grafana:11.5.1
+    container_name: grafana
+    restart: always
+    ports:
+      - 3000:3000
+#    volumes:
+#      - /srv/grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${pass:-focuspocus12}
+    networks:
+      - observability
+
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    container_name: prometheus
+    restart: always
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus_config.yml:/etc/prometheus/prometheus.yml
+#      - /srv/prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    restart: unless-stopped
+    networks:
+      - observability
+
+  loki:
+    image: grafana/loki:3.4
+    container_name: loki
+    restart: always
+    ports:
+      - 3100:3100
+    volumes:
+      - ./loki_config.yml:/etc/loki/local-config.yml
+    command:
+      - '-config.file=/etc/loki/local-config.yml'
+    networks:
+      - observability
+
+  node_exporter:
+    image: prom/node-exporter:v1.9.0
+    container_name: node_exporter
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - '9100:9100'
+    networks:
+      - observability
+
+  vector:
+    image: timberio/vector:0.43.1-debian
+    container_name: vector
+    restart: always
+    volumes:
+      - ./vector_config.yml:/etc/vector/vector.yaml
+    networks:
+      - observability
+
+#  cadvisor:
+#    image: gcr.io/cadvisor/cadvisor:v0.49.1
+#    container_name: cadvisor
+#    restart: unless-stopped
+#    ports:
+#      - "8080:8080"
+#    volumes:
+#      - /:/rootfs:ro
+#      - /var/run:/var/run:ro
+#      - /sys:/sys:ro
+#      - /var/lib/docker/:/var/lib/docker:ro
+#      - /dev/disk:/dev/disk:ro
+#    privileged: true
