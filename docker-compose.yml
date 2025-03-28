@@ -26,7 +26,6 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--web.enable-lifecycle"
-    restart: unless-stopped
     networks:
       - observability
 
