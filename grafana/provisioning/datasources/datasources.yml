@@ -1,0 +1,12 @@
+apiVersion: 1
+
+datasources:
+  - name: test_psql
+    type: postgres
+    url: "$psql_host:$psql_port"
+    database: "$psql_db"
+    user: "$psql_user"
+    secureJsonData:
+      password: "$psql_password"
+    jsonData:
+      sslmode: "disable"

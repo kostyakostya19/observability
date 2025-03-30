@@ -1,15 +1,22 @@
 --- 
 services:
-  grafana:
+  grafana-test:
     image: grafana/grafana:11.5.1
     container_name: grafana
     restart: always
     ports:
       - 3000:3000
-#    volumes:
-#      - /srv/grafana_data:/var/lib/grafana
+    volumes:
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources      
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${pass:-focuspocus12}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:-focuspocus12}
+      - psql_host=${psql_host:-127.0.0.1}
+      - psql_port=${psql_port:-5432}
+      - psql_db=${psql_db:-test}
+      - psql_user=${psql_user:-test_usr}
+      - psql_password=${psql_password:-1234}
     networks:
       - observability
 
@@ -21,7 +28,6 @@ services:
       - 9090:9090
     volumes:
       - ./prometheus_config.yml:/etc/prometheus/prometheus.yml
-#      - /srv/prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"

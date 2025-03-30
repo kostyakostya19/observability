@@ -3,6 +3,14 @@ sources:
       type: file
       include:
         - "/var/log/auth.log"
+  cloud_init:
+      type: file
+      include:
+        - "/var/log/cloud-init.log"
+  cloud_init_output:
+      type: file
+      include:
+        - "/var/log/cloud-init-output.log"
 
 sinks:
   auth_log:
@@ -13,6 +21,34 @@ sinks:
     labels:
       job: "auth_log"
       log_path: "/var/log/auth_log"
+      host: "{{ host }}"
+      level: "{{ level }}"
+    encoding:
+      codec: json
+
+sinks:
+  cloud_init:
+    type: loki
+    inputs:
+      - "cloud_init"
+    endpoint: "http://loki:3100"
+    labels:
+      job: "cloud_init"
+      log_path: "/var/log/cloud_init"
+      host: "{{ host }}"
+      level: "{{ level }}"
+    encoding:
+      codec: json
+
+sinks:
+  cloud_init_output:
+    type: loki
+    inputs:
+      - "cloud_init_output"
+    endpoint: "http://loki:3100"
+    labels:
+      job: "cloud_init_output"
+      log_path: "/var/log/cloud_init_output"
       host: "{{ host }}"
       level: "{{ level }}"
     encoding:
