@@ -1,1 +1,4 @@
 .env
+prometheus_config.yml
+loki_config.yml
+vector_config.yml
